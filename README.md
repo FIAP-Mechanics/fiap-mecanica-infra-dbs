@@ -80,8 +80,8 @@ existente, preserve a senha atual: trocar apenas o secret do GitHub não altera 
 Atualize as três credenciais AWS temporárias a cada sessão do Learner Lab. Execute este workflow depois do deploy de
 Kubernetes e antes do de Lambda, selecionando `homologacao` ou `main` em **Actions > Deploy > Run workflow**.
 
-O [guia de deploy dos quatro repositórios](https://github.com/FIAP-Mechanics/fiap-mecanica/blob/main/DEPLOY.md) reúne a
-tabela de secrets, a sequência completa e os erros já encontrados.
+O [README da aplicação](https://github.com/FIAP-Mechanics/fiap-mecanica#deploy-na-aws-aws-academy) reúne a tabela de secrets,
+a sequência completa e os erros já encontrados nos quatro repositórios.
 
 Regras do repositório: `main` e `homologacao` protegidas (sem commit direto, pull request, aprovação e checks de CI
 obrigatórios). O convite de colaboração de `soat-architecture` precisa ser aceito antes da entrega.
