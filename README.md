@@ -66,8 +66,25 @@ Validação sem credenciais: `terraform fmt -check && terraform init -backend=fa
   `DATABASE_PASSWORD`. Variables: `TF_STATE_BUCKET`, `AWS_REGION`. O script `aws-lab-secrets.sh` do `fiap-mecanica-k8s-infra`
   configura tudo.
 
-Regras do repositório: `main` e `homologacao` protegidas (sem commit direto, pull request obrigatório). O usuário
-`soat-architecture` tem acesso de leitura.
+### Configurar os Environments do GitHub
+
+Os Environments `homologacao` e `producao` deste repositório são independentes dos Environments da aplicação. Antes de
+executar [Deploy](.github/workflows/deploy.yml), confira em **Settings > Environments > ambiente**:
+
+- **Secrets obrigatórios:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` e `DATABASE_PASSWORD`.
+- **Variable obrigatória:** `TF_STATE_BUCKET`, com o mesmo bucket dos demais repositórios. `AWS_REGION` é opcional e usa
+  `us-east-1` por padrão.
+
+`DATABASE_PASSWORD` deve ter o mesmo valor neste repositório e em `fiap-mecanica` para o **mesmo** ambiente. Em produção
+existente, preserve a senha atual: trocar apenas o secret do GitHub não altera de forma coordenada os consumidores do banco.
+Atualize as três credenciais AWS temporárias a cada sessão do Learner Lab. Execute este workflow depois do deploy de
+Kubernetes e antes do de Lambda, selecionando `homologacao` ou `main` em **Actions > Deploy > Run workflow**.
+
+O [guia de deploy dos quatro repositórios](https://github.com/FIAP-Mechanics/fiap-mecanica/blob/main/DEPLOY.md) reúne a
+tabela de secrets, a sequência completa e os erros já encontrados.
+
+Regras do repositório: `main` e `homologacao` protegidas (sem commit direto, pull request, aprovação e checks de CI
+obrigatórios). O convite de colaboração de `soat-architecture` precisa ser aceito antes da entrega.
 
 ### Ordem de provisionamento
 
