@@ -3,6 +3,8 @@
 Infraestrutura do banco de dados gerenciado da Oficina Mecânica (Tech Challenge, Fase 3): **Amazon RDS for PostgreSQL**
 provisionado com Terraform. É o **repositório 3 de 4**.
 
+**APIs:** [collection Postman](https://github.com/FIAP-Mechanics/fiap-mecanica/blob/main/postman/mecanica-completa.postman_collection.json) · [OpenAPI da Lambda](https://github.com/FIAP-Mechanics/fiap-mecanica-lambda/blob/main/openapi.yaml).
+
 | Repositório | Papel |
 |---|---|
 | [fiap-mecanica-k8s-infra](https://github.com/FIAP-Mechanics/fiap-mecanica-k8s-infra) | VPC, EKS, dashboards e alertas |
@@ -47,13 +49,14 @@ flowchart LR
 ## Como executar
 
 Pré-requisitos: Terraform >= 1.10, credenciais AWS do Learner Lab e o ambiente de `fiap-mecanica-k8s-infra` já aplicado.
+Defina `TF_VAR_master_password` no ambiente antes de executar o Terraform.
 
 ```bash
 terraform init \
   -backend-config="bucket=<bucket>" -backend-config="key=infra-db/homologacao.tfstate" \
   -backend-config="region=us-east-1" -backend-config="use_lockfile=true"
 terraform apply -var-file=envs/homologacao.tfvars \
-  -var="state_bucket=<bucket>" -var="master_password=<senha>"
+  -var="state_bucket=<bucket>"
 ```
 
 Validação sem credenciais: `terraform fmt -check && terraform init -backend=false && terraform validate`.
@@ -62,9 +65,9 @@ Validação sem credenciais: `terraform fmt -check && terraform init -backend=fa
 
 - `ci.yml`: em pull request para `main` ou `homologacao`, roda `fmt -check`, `init -backend=false` e `validate`.
 - `deploy.yml`: push em `homologacao` aplica a **homologação**; push em `main` aplica **produção** (Environment `producao` com aprovação).
-- Secrets do Environment: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` (renovados a cada sessão do lab) e
-  `DATABASE_PASSWORD`. Variables: `TF_STATE_BUCKET`, `AWS_REGION`. O script `aws-lab-secrets.sh` do `fiap-mecanica-k8s-infra`
-  configura tudo.
+- Em `Settings > Environments > homologacao` ou `producao`, configure os secrets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
+  `AWS_SESSION_TOKEN` e `DATABASE_PASSWORD`, e a variable `TF_STATE_BUCKET`. `AWS_REGION` é opcional e usa `us-east-1` por padrão.
+  A senha deve coincidir com `DATABASE_PASSWORD` no mesmo Environment do repositório da aplicação.
 
 Regras do repositório: `main` e `homologacao` protegidas (sem commit direto, pull request obrigatório). O usuário
 `soat-architecture` tem acesso de leitura.
@@ -80,15 +83,11 @@ Limitações aceitas no laboratório: sem Multi-AZ, `skip_final_snapshot` ligado
 
 Não aplicável: este repositório contém apenas Terraform, sem imagem própria.
 
-## Swagger/Postman das APIs
-
-Este repositório não expõe API. As APIs ficam no repositório da aplicação:
-[collection Postman](https://github.com/FIAP-Mechanics/fiap-mecanica/blob/main/postman/mecanica-completa.postman_collection.json)
-e Swagger de cada serviço em `/swagger-ui.html`.
-
 ## Deploys ativos
 
 | Ambiente | Instância RDS | Endpoint |
 |---|---|---|
-| Homologação | `mecanica-homologacao` | privado (output `db_host`) |
-| Produção | `mecanica-producao` | privado (output `db_host`) |
+| Homologação | Não confirmado | Privado: output `db_host` |
+| Produção | Não confirmado | Privado: output `db_host` |
+
+Consulte os [deploys no GitHub Actions](https://github.com/FIAP-Mechanics/fiap-mecanica-infra-dbs/actions/workflows/deploy.yml).
